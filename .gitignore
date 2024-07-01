@@ -1,0 +1,11 @@
+
+# Temporary files
+*.swp
+*.tmp
+*.bak
+
+# Program config
+config.yml
+
+# Python
+__pycache__/
