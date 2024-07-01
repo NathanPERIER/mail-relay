@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+import sys
+from collections import deque
+
 import asyncio
 from aiosmtpd.controller import UnthreadedController as Controller
 from signal import SIGINT, SIGTERM
@@ -7,13 +10,31 @@ from signal import SIGINT, SIGTERM
 from src.config import load_config
 
 
+def help(retcode: int = 0) :
+    print(f"usage: {sys.argv[0]} [--conf <conf_path>]")
+    sys.exit(retcode)
+
 
 def on_exit(controller: Controller):
     print('Stopping')
     controller.loop.create_task(controller.finalize()).add_done_callback(lambda _: controller.loop.stop())
 
 def main():
-    conf = load_config('config.yml')
+
+    args = deque(sys.argv[1:])
+
+    if len(args) > 0 and args[0] in ['-h', '--help'] :
+        help()
+    
+    conf_path = 'config.yml'
+    if len(args) > 1 and args[0] == '--conf' :
+        args.popleft()
+        conf_path = args.popleft()
+    
+    if len(args) > 0 :
+        help(1)
+
+    conf = load_config(conf_path)
 
     loop = asyncio.new_event_loop()
 
