@@ -1,5 +1,5 @@
 
-from smtplib import SMTP, SMTP_SSL
+from aiosmtplib import SMTP
 
 from email.message import Message
 from email.mime.text import MIMEText
@@ -8,7 +8,6 @@ from src.utils.named_address import NamedAddress
 
 from typing import Final, Optional
 
-# TODO iosmtplib ?
 
 
 def replace_header(msg: Message, header: str, value: str):
@@ -39,44 +38,29 @@ class Mailer :
     
     def authenticated(self) -> bool :
         return self._username is not None and self._password is not None
-    
-    def _connect(self) -> "SMTP|SMTP_SSL" :
-        if self._starttls :
-            conn = SMTP_SSL(host = self._host, port = self._port)
-        else :
-            conn = SMTP(host = self._host, port = self._port)
-        conn.set_debuglevel(False)
+
+    async def _connect(self) -> SMTP :
+        conn = SMTP(hostname=self._host, port=self._port, start_tls=False, use_tls=self._starttls)
+        await conn.connect()
         if self.authenticated() :
-            conn.login(self._username, self._password)
+            await conn.login(self._username, self._password)
         return conn
 
-    def _send_mail(self, to: str, message: str):
+    async def _send_mail(self, to: str, message: str):
         # for line in message.splitlines() :
         #     print(f'> {line}'.rstrip())
         # print()
 
-        conn = self._connect()
+        conn = await self._connect()
 
         try:
-            conn.sendmail(self._sender.address, to, message)
+            await conn.sendmail(self._sender.address, to, message)
         finally:
-            conn.quit()
-    
-    def _from_addr(self) -> str :
-        return 
+            await conn.quit()
     
     def send_mail(self, to: str, msg: Message):
         replace_header(msg, 'From', str(self._sender))
         replace_header(msg, 'Reply-To', msg['From'])
         replace_header(msg, 'To', to)
 
-        self._send_mail(to, msg.as_string())
-    
-    def send_mail_basic(self, to: str, subject: str, content: str, mime_subtype: str = 'plain'):
-        msg = MIMEText(content, mime_subtype, 'utf-8')
-        msg['From'] = str(self._sender)
-        msg['Reply-To'] = msg['From']
-        msg['To'] = to
-        msg['Subject'] = subject
-
-        self._send_mail(to, msg.as_string())
+        return self._send_mail(to, msg.as_string())
