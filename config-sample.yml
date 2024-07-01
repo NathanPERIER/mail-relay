@@ -1,0 +1,12 @@
+
+relay:
+  smtp_port: 5025
+
+server:
+  host: "smtp.example.com"
+  port: 587
+  sender: "user@example.com"
+  starttls: True
+  auth:
+    username: "user"
+    password: "pass"
