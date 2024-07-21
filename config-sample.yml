@@ -1,6 +1,8 @@
 
 relay:
+  verbose: false
   smtp_port: 5025
+  smtp_host: "0.0.0.0"
 
 server:
   host: "smtp.example.com"

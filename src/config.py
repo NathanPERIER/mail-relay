@@ -1,4 +1,6 @@
 
+import logging
+
 import yaml
 
 from src.mailer import Mailer
@@ -14,6 +16,7 @@ class RelayConfig :
 
     def __init__(self, handler: RelayHandler) :
         self.smtp_port: int = 5025
+        self.smtp_host: str = "0.0.0.0"
         self.handler = handler
 
 
@@ -39,7 +42,11 @@ def load_config(filepath: str) -> RelayConfig :
 
     if 'relay' in data :
         relay_data = data['relay']
+        if 'smtp_host' in relay_data :
+            conf.smtp_host = relay_data['smtp_host']
         if 'smtp_port' in relay_data :
             conf.smtp_port = relay_data['smtp_port']
+        if 'verbose' in relay_data and relay_data['verbose'] == True :
+            logging.getLogger("relay").setLevel(logging.DEBUG)
 
     return conf

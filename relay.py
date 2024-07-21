@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sys
+import logging
 from collections import deque
 
 import asyncio
@@ -10,13 +11,18 @@ from signal import SIGINT, SIGTERM
 from src.config import load_config
 
 
+logging.basicConfig(encoding='utf-8', format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
+
+logger = logging.getLogger(f"relay.{__name__}")
+
+
 def help(retcode: int = 0) :
     print(f"usage: {sys.argv[0]} [--conf <conf_path>]")
     sys.exit(retcode)
 
 
 def on_exit(controller: Controller):
-    print('Stopping')
+    logger.info('Stopping')
     controller.loop.create_task(controller.finalize()).add_done_callback(lambda _: controller.loop.stop())
 
 def main():
@@ -36,9 +42,10 @@ def main():
 
     conf = load_config(conf_path)
 
-    loop = asyncio.new_event_loop()
+    logger.info("Server starting, listening on %s:%i", conf.smtp_host, conf.smtp_port)
 
-    controller = Controller(conf.handler, loop=loop, hostname='0.0.0.0', port=conf.smtp_port)
+    loop = asyncio.new_event_loop()
+    controller = Controller(conf.handler, loop=loop, hostname=conf.smtp_host, port=conf.smtp_port)
     controller.begin()
 
     for sig in [SIGINT, SIGTERM] :
@@ -46,7 +53,7 @@ def main():
 
     loop.run_forever()
 
-    print('Stopped')
+    logger.info('Stopped')
     
 
 
