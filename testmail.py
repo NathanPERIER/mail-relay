@@ -26,6 +26,7 @@ class SimpleMailer :
         msg['Reply-To'] = msg['From']
         msg['To'] = ", ".join(self._to)
         msg['Subject'] = 'Relay test'
+        msg['Message-ID'] = '<81ddd157-dd19-4561-a113-798b54f5a07d@example.com>'
         msg.preamble = msg['Subject']
         msg.attach(MIMEText('Hello o/', 'plain', 'utf-8'))
 

@@ -2,7 +2,6 @@
 from aiosmtplib import SMTP
 
 from email.message import Message
-from email.mime.text import MIMEText
 
 from src.utils.named_address import NamedAddress
 
@@ -15,6 +14,20 @@ def replace_header(msg: Message, header: str, value: str):
         msg.replace_header(header, value)
     else :
         msg[header] = value
+
+def replace_message_id(msg: Message, sender: str, header: str = 'Message-ID'):
+    if header not in msg :
+        return
+    val = msg[header].strip()
+    if val.startswith('<') and val.endswith('>') :
+        val = val[1:-1]
+    at_idx = val.rfind('@')
+    if at_idx == -1 :
+        return
+    val = val[:at_idx]
+    at_domain = sender[sender.rfind('@'):]
+    msg.replace_header(header, f'<{val}{at_domain}>')
+
 
 class Mailer :
 
@@ -51,6 +64,8 @@ class Mailer :
         #     print(f'> {line}'.rstrip())
         # print()
 
+        # TODO replace \n by \r\n ?
+
         conn = await self._connect()
 
         try:
@@ -62,5 +77,6 @@ class Mailer :
         replace_header(msg, 'From', str(self._sender))
         replace_header(msg, 'Reply-To', msg['From'])
         replace_header(msg, 'To', to)
+        replace_message_id(msg, self._sender.address)
 
         return self._send_mail(to, msg.as_string())

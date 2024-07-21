@@ -38,7 +38,7 @@ def main():
 
     loop = asyncio.new_event_loop()
 
-    controller = Controller(conf.handler, loop=loop, port=conf.smtp_port)
+    controller = Controller(conf.handler, loop=loop, hostname='0.0.0.0', port=conf.smtp_port)
     controller.begin()
 
     for sig in [SIGINT, SIGTERM] :
