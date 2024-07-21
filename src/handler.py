@@ -35,6 +35,6 @@ class RelayHandler:
         # print('\nEnd of message\n')
 
         msg = self._message_parser.parsestr(message)
-        await self._mailer.send_mail(envelope.rcpt_tos[0], msg)
+        await self._mailer.send_mail(envelope.rcpt_tos, msg)
         return '250 Message accepted for delivery'
 

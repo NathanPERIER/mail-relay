@@ -59,7 +59,7 @@ class Mailer :
             await conn.login(self._username, self._password)
         return conn
 
-    async def _send_mail(self, to: str, message: str):
+    async def _send_mail(self, to: list[str], message: str):
         # for line in message.splitlines() :
         #     print(f'> {line}'.rstrip())
         # print()
@@ -73,10 +73,10 @@ class Mailer :
         finally:
             await conn.quit()
     
-    def send_mail(self, to: str, msg: Message):
+    def send_mail(self, to: list[str], msg: Message):
         replace_header(msg, 'From', str(self._sender))
         replace_header(msg, 'Reply-To', msg['From'])
-        replace_header(msg, 'To', to)
+        replace_header(msg, 'To', ", ".join(to))
         replace_message_id(msg, self._sender.address)
 
         return self._send_mail(to, msg.as_string())
