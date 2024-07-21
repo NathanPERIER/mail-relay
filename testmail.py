@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+import argparse
+import sys
+
 from datetime import datetime, timezone
 
 from smtplib import SMTP
@@ -38,8 +41,16 @@ class SimpleMailer :
 
 
 def main():
-    mailer = SimpleMailer('localhost', 5025, 'test@localhost')
-    mailer.add_recipient('testuser@example.com')
+    parser = argparse.ArgumentParser(description='Simple SMTP relay test script.')
+    parser.add_argument('-s', '--host', nargs=1, help='hostname of the SMTP server', default='localhost')
+    parser.add_argument('-p', '--port', nargs=1, help='port of the SMTP server', type=int, default='5025')
+    parser.add_argument('-f', '--from', nargs=1, help='email address to use for the sender', default='testuser@localhost', dest='frm', metavar='FROM')
+    parser.add_argument('dest', nargs='+', help='email addresses to which the mail will be sent')
+    args = parser.parse_args(sys.argv[1:])
+
+    mailer = SimpleMailer(args.host, args.port, args.frm)
+    for dest_addr in args.dest :
+        mailer.add_recipient(dest_addr)
     mailer.send()
 
 if __name__ == '__main__' :
