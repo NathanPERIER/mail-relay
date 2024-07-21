@@ -1,6 +1,8 @@
 
 # Mail relay
 
+This is a simple mail relay that can be used internally to interface with an external mail provider. There are alternatives (namely [grafana/smtprelay](https://github.com/grafana/smtprelay)), but they ended up not working with my ISP's SMTP servers for some reason, which is why I started this project.
+
 ## Usage
 
 A configuration sample is provided in [`config-sample.yml`](./config-sample.yml).
@@ -38,7 +40,8 @@ services:
     user: "1000:1000"
 ```
 
-> Note: the configuration file in `/path/to/conf` must be named `config.yml`.
+> [!IMPORTANT]
+> The configuration file in `/path/to/conf` must be named `config.yml`.
 
 ### Run on host
 
