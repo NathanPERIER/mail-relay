@@ -11,9 +11,10 @@ from signal import SIGINT, SIGTERM
 from src.config import load_config
 
 
-logging.basicConfig(encoding='utf-8', format='%(asctime)s [%(levelname)s] %(message)s', level=logging.INFO)
+logging.basicConfig(encoding='utf-8', format='%(asctime)s [%(levelname)s] %(message)s', level=logging.WARN)
 
 logger = logging.getLogger(f"relay.{__name__}")
+logging.getLogger('relay').setLevel(logging.INFO)
 
 
 def help(retcode: int = 0) :
