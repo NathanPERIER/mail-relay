@@ -5,6 +5,7 @@ import sys
 
 from getpass import getpass
 from datetime import datetime, timezone
+from typing import Optional
 
 from smtplib import SMTP
 
@@ -14,13 +15,13 @@ from email.mime.multipart import MIMEMultipart
 
 class LoginInfo:
     def __init__(self, username: str, password: str):
-        self._username = username
-        self._password = password
+        self.username = username
+        self.password = password
 
 
 class SimpleMailer :
 
-    def __init__(self, host: str, port: int, sender: str, login: LoginInfo | None):
+    def __init__(self, host: str, port: int, sender: str, login: Optional[LoginInfo]):
         self._host = host
         self._port = port
         self._sender = sender
@@ -43,6 +44,8 @@ class SimpleMailer :
 
         conn = SMTP(host = self._host, port = self._port)
         try :
+            if self._login is not None :
+                conn.login(self._login.username, self._login.password)
             conn.sendmail(self._sender, self._to, msg.as_string())
         finally :
             conn.quit()

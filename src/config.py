@@ -51,6 +51,6 @@ def load_config(filepath: str) -> RelayConfig :
             logging.getLogger("relay").setLevel(logging.DEBUG)
         if 'auth' in relay_data :
             auth_data = relay_data['auth']
-            conf.auth = SingleUserAuthenticator(conf_data['user'], conf_data['password'])
+            conf.auth = SingleUserAuthenticator(auth_data['user'], auth_data['password'])
 
     return conf
