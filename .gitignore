@@ -9,3 +9,5 @@ config.yml
 
 # Python
 __pycache__/
+venv/
+
