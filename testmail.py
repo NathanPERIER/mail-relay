@@ -3,6 +3,7 @@
 import argparse
 import sys
 
+from getpass import getpass
 from datetime import datetime, timezone
 
 from smtplib import SMTP
@@ -11,12 +12,19 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
+class LoginInfo:
+    def __init__(self, username: str, password: str):
+        self._username = username
+        self._password = password
+
+
 class SimpleMailer :
 
-    def __init__(self, host: str, port: int, sender: str):
+    def __init__(self, host: str, port: int, sender: str, login: LoginInfo | None):
         self._host = host
         self._port = port
         self._sender = sender
+        self._login = login
         self._to: list[str] = []
 
     def add_recipient(self, to: str):
@@ -44,11 +52,16 @@ def main():
     parser = argparse.ArgumentParser(description='Simple SMTP relay test script.')
     parser.add_argument('-s', '--host', nargs=1, help='hostname of the SMTP server', default='localhost')
     parser.add_argument('-p', '--port', nargs=1, help='port of the SMTP server', type=int, default='5025')
+    parser.add_argument('-u', '--user', nargs=1, help='username for SMTP login', default='')
     parser.add_argument('-f', '--from', nargs=1, help='email address to use for the sender', default='testuser@localhost', dest='frm', metavar='FROM')
     parser.add_argument('dest', nargs='+', help='email addresses to which the mail will be sent')
     args = parser.parse_args(sys.argv[1:])
 
-    mailer = SimpleMailer(args.host, args.port, args.frm)
+    login = None
+    if len(args.user) > 0 :
+        password = getpass('Auth password > ')
+        login = LoginInfo(args.user, password)
+    mailer = SimpleMailer(args.host, args.port, args.frm, login)
     for dest_addr in args.dest :
         mailer.add_recipient(dest_addr)
     mailer.send()

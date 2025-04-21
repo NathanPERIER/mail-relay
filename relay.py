@@ -46,7 +46,7 @@ def main():
     logger.info("Server starting, listening on %s:%i", conf.smtp_host, conf.smtp_port)
 
     loop = asyncio.new_event_loop()
-    controller = Controller(conf.handler, loop=loop, hostname=conf.smtp_host, port=conf.smtp_port)
+    controller = Controller(conf.handler, loop=loop, hostname=conf.smtp_host, port=conf.smtp_port, authenticator=conf.auth, auth_required=(conf.auth is not None))
     controller.begin()
 
     for sig in [SIGINT, SIGTERM] :

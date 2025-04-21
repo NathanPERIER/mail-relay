@@ -1,7 +1,7 @@
 
 import logging
 
-from aiosmtpd.smtp import SMTP, Envelope, Session
+from aiosmtpd.smtp import SMTP, Envelope, Session, AuthResult, LoginPassword
 
 from email.parser import Parser
 
@@ -38,3 +38,14 @@ class RelayHandler:
         await self._mailer.send_mail(envelope.rcpt_tos, msg)
         return '250 Message accepted for delivery'
 
+
+class SingleUserAuthenticator:
+    def __init__(self, username: str, password: str):
+        self._username: str = username
+        self._password: str = password
+
+    def __call__(self, server: SMTP, session: Session, envelope: Envelope, mechanism: str, auth_data: LoginPassword) -> AuthResult :
+        if mechanism not in ['PLAIN', 'LOGIN'] :
+            return AuthResult(success=False)
+        print(auth_data)
+        return AuthResult(success=True)

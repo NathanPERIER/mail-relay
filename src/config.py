@@ -4,7 +4,7 @@ import logging
 import yaml
 
 from src.mailer import Mailer
-from src.handler import RelayHandler
+from src.handler import RelayHandler, SingleUserAuthenticator
 
 
 def load_yaml(filepath: str):
@@ -18,6 +18,7 @@ class RelayConfig :
         self.smtp_port: int = 5025
         self.smtp_host: str = "0.0.0.0"
         self.handler = handler
+        self.auth: SingleUserAuthenticator | None = None
 
 
 
@@ -48,5 +49,8 @@ def load_config(filepath: str) -> RelayConfig :
             conf.smtp_port = relay_data['smtp_port']
         if 'verbose' in relay_data and relay_data['verbose'] == True :
             logging.getLogger("relay").setLevel(logging.DEBUG)
+        if 'auth' in relay_data :
+            auth_data = relay_data['auth']
+            conf.auth = SingleUserAuthenticator(conf_data['user'], conf_data['password'])
 
     return conf
